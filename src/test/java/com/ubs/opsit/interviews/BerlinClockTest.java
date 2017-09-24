@@ -1,6 +1,7 @@
 package com.ubs.opsit.interviews;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -11,7 +12,13 @@ import org.junit.Test;
  */
 public class BerlinClockTest {
 
-    private BerlinClock iBerlinClock = new BerlinClock();
+    private BerlinClock iBerlinClock;
+    
+    @Before
+    public void setUp() {
+        
+        iBerlinClock = new BerlinClock();
+    }
     
     //Constants for frequently used literals
     private static final String ALL_OFF = "OOOOOOOOOOO";
