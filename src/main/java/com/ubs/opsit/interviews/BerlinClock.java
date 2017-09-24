@@ -72,8 +72,8 @@ public class BerlinClock implements TimeConverter {
         /**
          * First line of hours lits a lamp for every 5 hours.
          */
-        return generateLampStatuses(aHours, WEIGHTAGE_FIRST_LINE_HOURS,
-                NO_OF_BULBS_FIRST_LINE_HOURS, HoursEnum.ON.getSymbol(), HoursEnum.OFF.getSymbol());
+        return generateLampStatuses(aHours, WEIGHTAGE_FIRST_LINE_HOURS, NO_OF_LAMPS_FIRST_LINE_HOURS,
+                HoursEnum.ON.getSymbol(), HoursEnum.OFF.getSymbol(), 1, HoursEnum.ON.getSymbol());
     }
 
     /**
@@ -92,7 +92,8 @@ public class BerlinClock implements TimeConverter {
          * aHours % WEIGHTAGE_FIRST_LINE_HOURS % 5
          */
         return generateLampStatuses(aHours % WEIGHTAGE_FIRST_LINE_HOURS, WEIGHTAGE_SECOND_LINE_HOURS,
-                NO_OF_BULBS_SECOND_LINE_HOURS, HoursEnum.ON.getSymbol(), HoursEnum.OFF.getSymbol());
+                NO_OF_LAMPS_SECOND_LINE_HOURS, HoursEnum.ON.getSymbol(), HoursEnum.OFF.getSymbol(), 1,
+                HoursEnum.ON.getSymbol());
     }
 
     /**
@@ -105,21 +106,12 @@ public class BerlinClock implements TimeConverter {
      */
     public String buildMinutesFirstLine(final int aMinutes) {
 
-        StringBuilder lMinutesBuilder = new StringBuilder();
-        int lMinutesTemp = aMinutes;
-
-        // build first line of minutes
-        for (int lCount = 0; lCount < NO_OF_BULBS_FIRST_LINE_MINUTES; lCount++) {
-            lMinutesTemp = lMinutesTemp - WEIGHTAGE_FIRST_LINE_MINUTES;
-            if (lMinutesTemp >= 0 && (lCount + 1) % 3 == 0)
-                lMinutesBuilder.append(MinutesEnum.QUARTER.getSymbol());
-            else if (lMinutesTemp >= 0 && (lCount + 1) % 3 != 0)
-                lMinutesBuilder.append(MinutesEnum.ON.getSymbol());
-            else
-                lMinutesBuilder.append(MinutesEnum.OFF.getSymbol());
-        }
-
-        return lMinutesBuilder.toString();
+        /**
+         * First line of minutes lits a lamp for every 5 minutes. Also every 3rd
+         * lamp (denoting quarter) is RED.
+         */
+        return generateLampStatuses(aMinutes, WEIGHTAGE_FIRST_LINE_MINUTES, NO_OF_LAMPS_FIRST_LINE_MINUTES,
+                MinutesEnum.ON.getSymbol(), MinutesEnum.OFF.getSymbol(), 3, MinutesEnum.QUARTER.getSymbol());
     }
 
     /**
@@ -133,16 +125,18 @@ public class BerlinClock implements TimeConverter {
     public String buildMinutesSecondLine(final int aMinutes) {
 
         /**
-         * Second line of minutes lits a lamp for every minute missed by first line,
-         * so minutes argument must be aMinutes % WEIGHTAGE_FIRST_LINE_HOURS i.e
-         * aHours % WEIGHTAGE_FIRST_LINE_HOURS % 5
+         * Second line of minutes lits a lamp for every minute missed by first
+         * line, so minutes argument must be aMinutes %
+         * WEIGHTAGE_FIRST_LINE_HOURS i.e aHours % WEIGHTAGE_FIRST_LINE_HOURS %
+         * 5.
          */
         return generateLampStatuses(aMinutes % WEIGHTAGE_FIRST_LINE_MINUTES, WEIGHTAGE_SECOND_LINE_MINUTES,
-                NO_OF_BULBS_SECOND_LINE_MINUTES, MinutesEnum.ON.getSymbol(), MinutesEnum.OFF.getSymbol());
+                NO_OF_LAMPS_SECOND_LINE_MINUTES, MinutesEnum.ON.getSymbol(), MinutesEnum.OFF.getSymbol(), 1,
+                MinutesEnum.ON.getSymbol());
     }
 
     private String generateLampStatuses(final int aTime, final int aWeightageOfEachLamp, final int aNoOfLamps,
-            String aOnSymbol, String aOffSymbol) {
+            String aOnSymbol, String aOffSymbol, final int aSpecialLampAtPosition, final String aSpecialLampSymbol) {
 
         /**
          * Mutable and non - synchronized StringBuilder object to hold lamp
@@ -156,9 +150,20 @@ public class BerlinClock implements TimeConverter {
          * turned off. After each subtraction, if result is positive turn on the
          * subsequent bulb else turn it off.
          */
+        /**
+         * To further reduce duplicate code, first line of hours has a red lamp
+         * for every 3rd position, so while building that line, 3 will be passed
+         * as aSpecialLampAtPosition, for others 1 will be passed.
+         */
+
         for (int lCount = 0; lCount < aNoOfLamps; lCount++) {
-            lLampStatuses = aTime - (aWeightageOfEachLamp * (lCount + 1)) >= 0 ? lLampStatuses.append(aOnSymbol)
-                    : lLampStatuses.append(aOffSymbol);
+            int lTempTime = aTime - (aWeightageOfEachLamp * (lCount + 1));
+            if (lTempTime >= 0 && (lCount + 1) % aSpecialLampAtPosition == 0)
+                lLampStatuses.append(aSpecialLampSymbol);
+            else if (lTempTime >= 0 && (lCount + 1) % aSpecialLampAtPosition != 0)
+                lLampStatuses.append(aOnSymbol);
+            else
+                lLampStatuses.append(aOffSymbol);
         }
 
         return lLampStatuses.toString();
