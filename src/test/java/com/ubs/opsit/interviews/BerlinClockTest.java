@@ -12,13 +12,17 @@ import org.junit.Test;
 public class BerlinClockTest {
 
     private BerlinClock iBerlinClock = new BerlinClock();
+    
+    //Constants for frequently used literals
+    private static final String ALL_OFF = "OOOOOOOOOOO";
+    private static final String FIFTEEN_MINUTES = "YYROOOOOOOO";
 
     @Test
     public void testMidnight() {
 
         String lMidnightTime = iBerlinClock.convertTime("24:00:00");
         String lExpectedTime = "Y" + System.lineSeparator() + "RRRR" + System.lineSeparator() + "RRRR"
-                + System.lineSeparator() + "OOOOOOOOOOO" + System.lineSeparator() + "OOOO";
+                + System.lineSeparator() + ALL_OFF + System.lineSeparator() + "OOOO";
         Assert.assertEquals(lExpectedTime, lMidnightTime);
     }
 
@@ -36,7 +40,7 @@ public class BerlinClockTest {
 
         String lMiddleOfAfternoonTime = iBerlinClock.convertTime("13:17:01");
         String lExpectedTime = "O" + System.lineSeparator() + "RROO" + System.lineSeparator() + "RRRO"
-                + System.lineSeparator() + "YYROOOOOOOO" + System.lineSeparator() + "YYOO";
+                + System.lineSeparator() + FIFTEEN_MINUTES + System.lineSeparator() + "YYOO";
 
         Assert.assertEquals(lExpectedTime, lMiddleOfAfternoonTime);
     }
@@ -46,7 +50,7 @@ public class BerlinClockTest {
 
         String lMidnightTime = iBerlinClock.convertTime("00:00:00");
         String lExpectedTime = "Y" + System.lineSeparator() + "OOOO" + System.lineSeparator() + "OOOO"
-                + System.lineSeparator() + "OOOOOOOOOOO" + System.lineSeparator() + "OOOO";
+                + System.lineSeparator() + ALL_OFF + System.lineSeparator() + "OOOO";
         Assert.assertEquals(lExpectedTime, lMidnightTime);
     }
 
@@ -185,12 +189,12 @@ public class BerlinClockTest {
     @Test
     public void testBuildMinutesFirstLine() {
         
-        Assert.assertEquals("OOOOOOOOOOO", iBerlinClock.buildMinutesFirstLine(0));
-        Assert.assertEquals("OOOOOOOOOOO", iBerlinClock.buildMinutesFirstLine(1));
+        Assert.assertEquals(ALL_OFF, iBerlinClock.buildMinutesFirstLine(0));
+        Assert.assertEquals(ALL_OFF, iBerlinClock.buildMinutesFirstLine(1));
         Assert.assertEquals("YOOOOOOOOOO", iBerlinClock.buildMinutesFirstLine(5));
         Assert.assertEquals("YOOOOOOOOOO", iBerlinClock.buildMinutesFirstLine(6));
-        Assert.assertEquals("YYROOOOOOOO", iBerlinClock.buildMinutesFirstLine(17));
-        Assert.assertEquals("YYROOOOOOOO", iBerlinClock.buildMinutesFirstLine(15));
+        Assert.assertEquals(FIFTEEN_MINUTES, iBerlinClock.buildMinutesFirstLine(17));
+        Assert.assertEquals(FIFTEEN_MINUTES, iBerlinClock.buildMinutesFirstLine(15));
         Assert.assertEquals("YYRYYROOOOO", iBerlinClock.buildMinutesFirstLine(30));
         Assert.assertEquals("YYRYYROOOOO", iBerlinClock.buildMinutesFirstLine(31));
         Assert.assertEquals("YYRYYRYYRYY", iBerlinClock.buildMinutesFirstLine(59));
